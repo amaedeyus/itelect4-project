@@ -1,26 +1,52 @@
+// ===== ENUMS =====
+export const enum Role {
+  Student = "student",
+  SecurityAdmin = "security_admin"
+}
+
+export enum ClaimStatus {
+  Pending,
+  Verified,
+  Rejected
+}
+
 // ===== INTERFACES =====
 // An interface defines the SHAPE of an object -- what fields it must have.
 export interface User {
-id: number;
-name: string;
-email: string;
-role: "student" | "admin" | "instructor"; // only these values
-isActive: boolean;
+  id: number;
+  name: string;
+  email: string;
+  role: Role;
+  isActive: boolean;
 }
-export interface Course {
-code: string;
-title: string;
-units: number;
-semester: string;
+
+export interface LostFoundItem {
+  id: number;
+  title: string;
+  description: string;
+  type: "lost" | "found";
+  reporterId: number;
+  createdAt: Date;
 }
-export interface Submission {
-id: number;
-studentId: number;
-courseCode: string;
-repoUrl: string;
-submittedAt: Date;
-score?: number; // ? means this field is optional
+
+export interface Claim {
+  id: number;
+  itemId: number;
+  claimantId: number;
+  status: ClaimStatus;
+  notes?: string; // ? means this field is optional
 }
+
+// ===== GENERIC INTERFACE =====
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  message?: string;
+}
+
+// ===== UTILITY TYPES =====
+export type ItemUpdate = Partial<LostFoundItem>;
+export type ItemPreview = Pick<LostFoundItem, "id" | "title" | "type">;
 
 // ===== TYPE ALIASES =====
 // A type alias gives a name to any type -- primitives, unions, functions, objects
@@ -28,8 +54,8 @@ score?: number; // ? means this field is optional
 export type ID = number | string;
 // Alias for an object shape
 export type Coordinate = {
-x: number;
-y: number;
+  x: number;
+  y: number;
 };
 // Alias for a function signature
 export type Formatter = (value: number) => string;
@@ -45,19 +71,13 @@ export type StringOrNumber = string | number;
 export type Status = "pending" | "active" | "inactive"; // literal union
 // Function that accepts a union type
 export function printId(id: StringOrNumber): void {
-console.log(`ID: ${id}`);
+  console.log(`ID: ${id}`);
 }
 printId(101);
 printId("S2026-001");
+
 // ===== INTERSECTION TYPES -- combines ALL properties =====
-// StudentWithCourse must have all User fields AND enrolledCourse AND gpa
-export type StudentWithCourse = User & {
-enrolledCourse: Course;
-gpa: number;
-};
-const topStudent: StudentWithCourse = {
-id: 1, name: "Maria Santos", email: "m@example.com",
-role: "student", isActive: true,
-enrolledCourse: { code: "ITELECT4", title: "IT Elective 4", units: 3, semester: "1st" },
-gpa: 1.25,
+export type StudentWithItems = User & {
+  reportedItems: LostFoundItem[];
+  claimsSubmitted: Claim[];
 };

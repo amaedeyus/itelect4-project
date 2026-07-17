@@ -1,4 +1,5 @@
-import type { User, Course, Submission } from "../types/index";
+import type { User, LostFoundItem, Claim, ApiResponse, ItemUpdate, ItemPreview } from "../types/index";
+import { Role, ClaimStatus } from "../types/index";
 
 // ===== PRIMITIVE TYPE ANNOTATIONS =====
 // Variables with explicit types
@@ -40,17 +41,59 @@ const student: User = {
 id: 1,
 name: "Juan dela Cruz",
 email: "juan@example.com",
-role: "student",
+role: Role.Student,
 isActive: true,
 };
-const course: Course = {
-code: "ITELECT4",
-title: "IT Elective 4",
-units: 3,
-semester: "1st Semester 2026-2027",
+const lostItem: LostFoundItem = {
+id: 101,
+title: "Keys near canteen",
+description: "Found a bunch of keys with a blue keychain.",
+type: "found",
+reporterId: 1,
+createdAt: new Date(),
 };
 console.log(student);
-console.log(course);
+console.log(lostItem);
+
+// ===== GENERIC FUNCTIONS =====
+// T is inferred automatically from whatever array you pass in
+function getFirst<T>(items: T[]): T | undefined {
+  return items[0];
+}
+
+// Constrained generic -- T must have an "id: number" field
+function getById<T extends { id: number }>(
+  items: T[],
+  id: number
+): T | undefined {
+  return items.find((item) => item.id === id);
+}
+
+const firstUser = getFirst<User>([student]);
+const foundItem = getById<LostFoundItem>([lostItem], 101);
+console.log(firstUser?.name);
+console.log(foundItem?.title);
+
+// ===== USING GENERIC INTERFACE =====
+const itemResponse: ApiResponse<LostFoundItem> = {
+  success: true,
+  data: lostItem,
+};
+console.log(itemResponse.data.title);
+
+// ===== USING UTILITY TYPES =====
+// Partial<T> -- update payload only needs the changed fields
+const patch: ItemUpdate = { description: "Keys found near the vending machine." };
+
+// Pick<T,K> -- a lightweight preview object
+const preview: ItemPreview = { id: 101, title: "Keys near canteen", type: "found" };
+console.log(preview);
+
+// ===== USING ENUMS =====
+let status: ClaimStatus = ClaimStatus.Pending;
+console.log(ClaimStatus[status]); // "Pending" -- reverse mapping
+status = ClaimStatus.Verified;
+console.log(status === ClaimStatus.Verified); // true
 
 // ===== TYPE NARROWING =====
 import type { StringOrNumber } from "../types/index";
