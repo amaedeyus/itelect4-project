@@ -6,16 +6,16 @@ import { Role, ClaimStatus } from "./types/index";
 
 const mockUser: User = {
   id: 1,
-  name: "Xyrelle Dominique",
-  email: "xyrelle@example.com",
+  name: "Xyrelle Dominique Talens",
+  email: "xyrelle762004@gmail.com",
   role: Role.Student,
   isActive: true,
 };
 
 const mockItem: LostFoundItem = {
   id: 101,
-  title: "Keys near canteen",
-  description: "Found a bunch of keys with a blue keychain.",
+  title: "C2 na green sa Chez",
+  description: "May c2 na green na medyo ubos",
   type: "found",
   reporterId: 1,
   createdAt: new Date(),
@@ -26,14 +26,14 @@ const mockClaim: Claim = {
   itemId: 101,
   claimantId: 2,
   status: ClaimStatus.Pending,
-  notes: "Matches description of missing house keys.",
+  notes: "Matches description of missing unfinished drink.",
 };
 
 function App() {
   return (
     <div className="app" style={{ padding: "20px" }}>
       <h1>Campus Lost & Found Tracker Dashboard</h1>
-      <hr />
+      <hr/>
       
       <h2>Active User Session</h2>
       <UserCard user={mockUser} onSelect={(u) => console.log("Selected Profile:", u)} />
