@@ -1,23 +1,77 @@
-# Campus Lost & Found Tracker
+# React + TypeScript + Vite
 
-## Project Concept
-The Campus Lost & Found Tracker is a specialized platform designed to streamline the reporting, tracking, and claiming of misplaced items within the school campus. Students can post lost or found items, while security administrators manage and verify ownership claims to ensure items return safely to their rightful owners.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Defined Core Types & Interfaces
-- **Role**: Enum containing authorized access levels (`student`, `security_admin`).
-- **ClaimStatus**: Runtime Enum handling the lifecycle verification stage (`Pending`, `Verified`, `Rejected`).
-- **User**: Represents application users and profiles.
-- **LostFoundItem**: Defines structural parameters for items logged into the tracker.
-- **Claim**: Structure tracking formal requests to claim an item.
-- **ApiResponse<T>**: A reusable generic wrapper format handling uniform server responses.
-- **ItemUpdate & ItemPreview**: Utility types managing specific data fields for update payloads and item galleries.
+Currently, two official plugins are available:
 
-## Setup and Execution
-To set up the project and see the code running, use the following commands in your terminal:
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-```bash
-# Install dependencies
-npm install
+## React Compiler
 
-# Run the TypeScript entry point
-npx ts-node src/index.ts
+The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+
+Note: This will impact Vite dev & build performances.
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
+
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+
+```
+
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+
+```
