@@ -7,11 +7,9 @@ interface UserCardProps {
 }
 
 function UserCard({ user, onSelect }: UserCardProps) {
-  const handleClick = (
-    e: React.MouseEvent<HTMLButtonElement>
-  ): void => {
-    onSelect(user);
-  };
+  const handleClick = (): void => {
+  onSelect(user);
+};
 
   const handleNoteChange = (
     e: React.ChangeEvent<HTMLInputElement>

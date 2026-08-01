@@ -1,5 +1,5 @@
 // ===== ENUMS =====
-export const enum Role {
+export enum Role {
   Student = "student",
   SecurityAdmin = "security_admin"
 }
@@ -61,7 +61,6 @@ export type Coordinate = {
 export type Formatter = (value: number) => string;
 // Using them
 const studentId: ID = "S2026-001";
-const position: Coordinate = { x: 10, y: 20 };
 const formatScore: Formatter = (value) => `${value}%`;
 console.log(studentId); // S2026-001
 console.log(formatScore(95.5)); // 95.5%
