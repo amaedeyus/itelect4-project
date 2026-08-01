@@ -36,20 +36,22 @@ const mockClaim: Claim = {
 };
 
 function App() {
-  // ===== useState<T> =====
+  // ===== State =====
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [items, setItems] = useState<LostFoundItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isError, setIsError] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  // ===== useRef =====
+  // ===== Ref =====
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // ===== Custom Hooks =====
   const [showClaims, toggleClaims] = useToggle(true);
+  const [isDarkMode, toggleDarkMode] = useToggle(false);
   const previousSearch = usePrevious(searchTerm);
 
-  // ===== useEffect =====
+  // ===== Load Mock Data =====
   useEffect(() => {
     setTimeout(() => {
       setItems([mockItem]);
@@ -57,102 +59,151 @@ function App() {
     }, 500);
   }, []);
 
-  // ===== Typed onChange =====
+  // ===== Search =====
   const handleSearchChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ): void => {
     setSearchTerm(e.target.value);
   };
 
-  // ===== Filtered Items =====
-  const filteredItems = items.filter((item) =>
-    item.title.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredItems = items.filter(
+    (item) =>
+      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // ===== Styled Loading =====
   if (isLoading) {
-    return <p>Loading items...</p>;
+    return (
+      <div className="animate-pulse p-6 text-center text-lg text-gray-500">
+        Loading Lost & Found records...
+      </div>
+    );
+  }
+
+  // ===== Styled Error =====
+  if (isError) {
+    return (
+      <div className="m-6 rounded-lg bg-red-100 p-4 text-red-700">
+        Unable to load records. Please try again.
+      </div>
+    );
   }
 
   return (
-    <div className="app" style={{ padding: "20px" }}>
-      <h1>Campus Lost & Found Tracker Dashboard</h1>
+    <div className={isDarkMode ? "dark" : ""}>
+      <div className="min-h-screen bg-gray-100 p-6 transition-colors dark:bg-gray-900">
 
-      <hr />
+        {/* Header */}
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Campus Lost & Found Tracker
+          </h1>
 
-      <h2>Search Items</h2>
-
-      <input
-        ref={searchInputRef}
-        type="text"
-        placeholder="Search item..."
-        value={searchTerm}
-        onChange={handleSearchChange}
-      />
-
-      <button
-        style={{ marginLeft: "10px" }}
-        onClick={() => searchInputRef.current?.focus()}
-      >
-        Focus Search
-      </button>
-
-      {previousSearch !== undefined &&
-        previousSearch !== searchTerm && (
-          <p>Previous Search: "{previousSearch}"</p>
-        )}
-
-      <hr />
-
-      <h2>Active User Session</h2>
-
-      <UserCard
-        user={mockUser}
-        onSelect={setSelectedUser}
-      />
-
-      {selectedUser && (
-        <p>
-          <strong>Selected User:</strong> {selectedUser.name}
-        </p>
-      )}
-
-      <hr />
-
-      <h2>Recent Postings</h2>
-
-      {filteredItems.length === 0 ? (
-        <p>No matching items found.</p>
-      ) : (
-        filteredItems.map((item) => (
-          <ItemCard
-            key={item.id}
-            item={item}
-          />
-        ))
-      )}
-
-      <hr />
-
-      <button onClick={toggleClaims}>
-        {showClaims ? "Hide Claims" : "Show Claims"}
-      </button>
-
-      {showClaims && (
-        <>
-          <h2>Active Claims</h2>
-
-          <ClaimBadge claim={mockClaim}>
-            <span
-              style={{
-                color: "orange",
-                fontWeight: "bold",
-              }}
+          <div className="flex gap-2">
+            <button
+              onClick={toggleDarkMode}
+              className="rounded bg-gray-800 px-4 py-2 text-white transition hover:bg-black dark:bg-gray-200 dark:text-gray-900"
             >
-              ⚠️ Action Required by Security
-            </span>
-          </ClaimBadge>
-        </>
-      )}
+              {isDarkMode ? "☀ Light Mode" : "🌙 Dark Mode"}
+            </button>
+
+            <button
+              onClick={() => setIsError(true)}
+              className="rounded bg-red-600 px-4 py-2 text-white transition hover:bg-red-700"
+            >
+              Simulate Error
+            </button>
+          </div>
+        </div>
+
+        {/* Search */}
+        <div className="mb-6">
+          <input
+            ref={searchInputRef}
+            value={searchTerm}
+            onChange={handleSearchChange}
+            placeholder="Search lost/found items..."
+            className="w-full rounded border border-gray-300 p-3 shadow-sm outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+          />
+
+          <button
+            onClick={() => searchInputRef.current?.focus()}
+            className="mt-3 rounded bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
+          >
+            Focus Search
+          </button>
+
+          {previousSearch !== undefined &&
+            previousSearch !== searchTerm && (
+              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                Previous Search: "{previousSearch}"
+              </p>
+            )}
+        </div>
+
+        {/* Responsive Grid */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
+          {/* User */}
+          <div>
+            <h2 className="mb-3 text-xl font-semibold dark:text-white">
+              Active User
+            </h2>
+
+            <UserCard
+              user={mockUser}
+              onSelect={setSelectedUser}
+            />
+
+            {selectedUser && (
+              <p className="mt-2 text-sm text-green-600 dark:text-green-400">
+                Selected User: {selectedUser.name}
+              </p>
+            )}
+          </div>
+
+          {/* Items */}
+          <div>
+            <h2 className="mb-3 text-xl font-semibold dark:text-white">
+              Recent Items
+            </h2>
+
+            {filteredItems.length === 0 ? (
+              <p className="text-gray-500 dark:text-gray-400">
+                No matching items.
+              </p>
+            ) : (
+              filteredItems.map((item) => (
+                <ItemCard
+                  key={item.id}
+                  item={item}
+                  variant="compact"
+                />
+              ))
+            )}
+          </div>
+
+          {/* Claims */}
+          <div>
+            <button
+              onClick={toggleClaims}
+              className="mb-3 rounded bg-purple-600 px-4 py-2 text-white transition hover:bg-purple-700"
+            >
+              {showClaims ? "Hide Claims" : "Show Claims"}
+            </button>
+
+            {showClaims && (
+              <ClaimBadge claim={mockClaim}>
+                <span className="font-semibold text-orange-500">
+                  ⚠ Action Required by Security
+                </span>
+              </ClaimBadge>
+            )}
+          </div>
+
+        </div>
+      </div>
     </div>
   );
 }
