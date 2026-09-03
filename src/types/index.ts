@@ -80,3 +80,8 @@ export type StudentWithItems = User & {
   reportedItems: LostFoundItem[];
   claimsSubmitted: Claim[];
 };
+
+export type ApiLostFoundItem =
+  Omit<LostFoundItem, "createdAt"> & {
+    createdAt: string;
+  };

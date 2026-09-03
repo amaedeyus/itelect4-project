@@ -1,16 +1,30 @@
 import { Link, useParams } from "react-router";
+import { useQuery } from "@tanstack/react-query";
 
 import ItemCard from "../components/ItemCard";
-import { mockItems } from "../data/mockData";
+
+import { fetchItemById } from "../api/client";
+
+import type { ApiLostFoundItem, LostFoundItem } from "../types";
 
 function ItemDetailPage() {
   const { id } = useParams<{ id: string }>();
 
-  const item = mockItems.find(
-    (currentItem) => currentItem.id === Number(id)
-  );
+  const {
+    data: item,
+    isPending,
+    isError,
+  } = useQuery<ApiLostFoundItem>({
+    queryKey: ["items", id],
+    queryFn: () => fetchItemById(id!),
+    enabled: id !== undefined,
+  });
 
-  if (!item) {
+  if (isPending) {
+    return <p>Loading item...</p>;
+  }
+
+  if (isError || !item) {
     return (
       <div className="rounded-lg bg-red-50 p-6 text-red-700 dark:bg-red-900/30 dark:text-red-300">
         <h1 className="text-2xl font-bold">
@@ -31,6 +45,11 @@ function ItemDetailPage() {
     );
   }
 
+  const itemForCard: LostFoundItem = {
+    ...item,
+    createdAt: new Date(item.createdAt),
+  };
+
   return (
     <div>
       <div className="mb-6">
@@ -47,7 +66,7 @@ function ItemDetailPage() {
       </h1>
 
       <ItemCard
-        item={item}
+        item={itemForCard}
         variant="default"
       />
 
