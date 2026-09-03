@@ -1,12 +1,34 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import UserCard from "../components/UserCard";
 import ClaimBadge from "../components/ClaimBadge";
+import { fetchClaims } from "../api/client";
 
-import { mockUser, mockClaim } from "../data/mockData";
+import type { User, Claim } from "../types";
+import { Role } from "../types";
 
 function DashboardPage() {
-  const [selectedUser, setSelectedUser] = useState(mockUser);
+  const dashboardUser: User = {
+    id: 1,
+    name: "Campus Student",
+    email: "student@campus.edu",
+    role: Role.Student,
+    isActive: true,
+  };
+
+  const [selectedUser, setSelectedUser] = useState<User>(dashboardUser);
+
+  const {
+    data: claims,
+    isPending,
+    isError,
+  } = useQuery<Claim[]>({
+    queryKey: ["claims"],
+    queryFn: fetchClaims,
+  });
+
+  const activeClaim = claims?.[0];
 
   return (
     <div className="space-y-6">
@@ -27,7 +49,7 @@ function DashboardPage() {
           </h2>
 
           <UserCard
-            user={mockUser}
+            user={dashboardUser}
             onSelect={setSelectedUser}
           />
 
@@ -43,11 +65,31 @@ function DashboardPage() {
             Active Claim
           </h2>
 
-          <ClaimBadge claim={mockClaim}>
-            <span className="font-semibold text-orange-500">
-              ⚠ Action Required by Security
-            </span>
-          </ClaimBadge>
+          {isPending && (
+            <p className="text-gray-600 dark:text-gray-300">
+              Loading claim...
+            </p>
+          )}
+
+          {isError && (
+            <p className="text-red-600 dark:text-red-400">
+              Could not load claims.
+            </p>
+          )}
+
+          {!isPending && !isError && !activeClaim && (
+            <p className="text-gray-600 dark:text-gray-300">
+              No claims have been submitted yet.
+            </p>
+          )}
+
+          {activeClaim && (
+            <ClaimBadge claim={activeClaim}>
+              <span className="font-semibold text-orange-500">
+                ⚠ Action Required by Security
+              </span>
+            </ClaimBadge>
+          )}
         </section>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-import useAuthStore from "../store/authStore";
+import { useAuthStore } from "../store/authStore";
 
 function LoginPage() {
   const [name, setName] = useState<string>("");

@@ -3,7 +3,7 @@ import {
   Outlet,
 } from "react-router";
 
-import useAuthStore from "../store/authStore";
+import { useAuthStore } from "../store/authStore";
 
 function ProtectedRoute() {
   const token = useAuthStore((state) => state.token);
