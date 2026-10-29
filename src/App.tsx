@@ -12,6 +12,7 @@ import ClaimsPage from "./pages/ClaimsPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
 import AiReviewPage from "./pages/aiReviewPage";
+import RegisterPage from "./pages/RegisterPage";
 
 function App() {
   return (
@@ -26,7 +27,8 @@ function App() {
           element={<ItemDetailPage />}
         />
 
-        <Route path="login" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage />} />
+<Route path="/register" element={<RegisterPage />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="claims" element={<ClaimsPage />} />
