@@ -1,10 +1,11 @@
+
 import type {
   AiReply,
   ApiLostFoundItem,
   User,
 } from "../types";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL?.replace(/\/+$/, "");
 
 if (!API_URL) {
   throw new Error("VITE_API_URL is not configured.");
@@ -38,7 +39,11 @@ async function request<T>(
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const response = await fetch(`${API_URL}${path}`, {
+  // Normalize the path to prevent URLs containing "//api".
+  const normalizedPath = `/${path.replace(/^\/+/, "")}`;
+  const url = `${API_URL}${normalizedPath}`;
+
+  const response = await fetch(url, {
     ...options,
     headers,
   });
@@ -108,7 +113,6 @@ export function createItem(
     token
   );
 }
-
 
 export function askAi(
   prompt: string,
