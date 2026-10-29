@@ -1,87 +1,113 @@
-// ===== ENUMS =====
-export const enum Role {
+
+/* ===== ENUMS ===== */
+
+export enum Role {
   Student = "student",
-  SecurityAdmin = "security_admin"
+  SecurityAdmin = "security_admin",
 }
 
 export enum ClaimStatus {
-  Pending,
-  Verified,
-  Rejected
+  Pending = "pending",
+  Verified = "verified",
+  Rejected = "rejected",
 }
 
-// ===== INTERFACES =====
-// An interface defines the SHAPE of an object -- what fields it must have.
+/* ===== ID TYPES ===== */
+
+// MongoDB document IDs and references are represented as strings
+// in the frontend API types.
+export type ID = string;
+
+/* ===== USER ===== */
+
 export interface User {
-  id: number;
+  id: ID;
   name: string;
   email: string;
   role: Role;
   isActive: boolean;
 }
 
+/* ===== LOST AND FOUND ITEMS ===== */
+
 export interface LostFoundItem {
-  id: number;
+  id: ID;
   title: string;
   description: string;
   type: "lost" | "found";
-  reporterId: number;
+  reporterId: ID;
   createdAt: Date;
 }
 
+// The API serializes dates to strings in JSON.
+export type ApiLostFoundItem = Omit<
+  LostFoundItem,
+  "createdAt"
+> & {
+  createdAt: string;
+};
+
+/* ===== CLAIMS ===== */
+
 export interface Claim {
-  id: number;
-  itemId: number;
-  claimantId: number;
+  id: ID;
+  itemId: ID;
+  claimantId: ID;
   status: ClaimStatus;
-  notes?: string; // ? means this field is optional
+  notes?: string;
 }
 
-// ===== GENERIC INTERFACE =====
+/* ===== GENERIC INTERFACE ===== */
+
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
   message?: string;
 }
 
-// ===== UTILITY TYPES =====
-export type ItemUpdate = Partial<LostFoundItem>;
-export type ItemPreview = Pick<LostFoundItem, "id" | "title" | "type">;
+/* ===== UTILITY TYPES ===== */
 
-// ===== TYPE ALIASES =====
-// A type alias gives a name to any type -- primitives, unions, functions, objects
-// Alias for a union type (string OR number)
-export type ID = number | string;
-// Alias for an object shape
+export type ItemUpdate = Partial<
+  Pick<LostFoundItem, "title" | "description" | "type">
+>;
+
+export type ItemPreview = Pick<
+  LostFoundItem,
+  "id" | "title" | "type"
+>;
+
+/* ===== TYPE ALIASES ===== */
+
 export type Coordinate = {
   x: number;
   y: number;
 };
-// Alias for a function signature
+
 export type Formatter = (value: number) => string;
-// Using them
-const studentId: ID = "S2026-001";
-const formatScore: Formatter = (value) => `${value}%`;
-console.log(studentId); // S2026-001
-console.log(formatScore(95.5)); // 95.5%
 
-// ===== UNION TYPES -- One OR the other =====
 export type StringOrNumber = string | number;
-export type Status = "pending" | "active" | "inactive"; // literal union
-// Function that accepts a union type
-export function printId(id: StringOrNumber): void {
-  console.log(`ID: ${id}`);
-}
-printId(101);
-printId("S2026-001");
 
-// ===== INTERSECTION TYPES -- combines ALL properties =====
+export type Status = "pending" | "active" | "inactive";
+
+/* ===== INTERSECTION TYPES ===== */
+
 export type StudentWithItems = User & {
   reportedItems: LostFoundItem[];
   claimsSubmitted: Claim[];
 };
 
-export type ApiLostFoundItem =
-  Omit<LostFoundItem, "createdAt"> & {
-    createdAt: string;
-  };
+
+/* ===== AI REPORT REVIEW ===== */
+
+export type AiReadiness = "ready" | "almost" | "not-yet";
+
+export interface AiReply {
+  summary: string;
+  strengths: string[];
+  improvements: string[];
+  readiness: AiReadiness;
+}
+
+export interface AiRequest {
+  prompt: string;
+}

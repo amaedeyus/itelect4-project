@@ -1,3 +1,4 @@
+
 import { Routes, Route } from "react-router";
 
 import Layout from "./components/Layout";
@@ -10,38 +11,29 @@ import LoginPage from "./pages/LoginPage";
 import ClaimsPage from "./pages/ClaimsPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
+import AiReviewPage from "./pages/aiReviewPage";
+
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route index element={<DashboardPage />} />
 
-        <Route
-          path="items"
-          element={<ItemsPage />}
-        />
+        <Route path="items" element={<ItemsPage />} />
 
         <Route
           path="items/:id"
           element={<ItemDetailPage />}
         />
 
-        <Route
-          path="login"
-          element={<LoginPage />}
-        />
+        <Route path="login" element={<LoginPage />} />
 
         <Route element={<ProtectedRoute />}>
-          <Route
-            path="claims"
-            element={<ClaimsPage />}
-          />
+          <Route path="claims" element={<ClaimsPage />} />
+          <Route path="ai-review" element={<AiReviewPage />} />
         </Route>
 
-        <Route
-          path="*"
-          element={<NotFoundPage />}
-        />
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
   );

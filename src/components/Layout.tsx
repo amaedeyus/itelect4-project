@@ -52,12 +52,15 @@ function Layout() {
                 Items
               </NavLink>
 
-              <NavLink
-                to="/claims"
-                className={navLinkClass}
-              >
-                Claims
-              </NavLink>
+              {token && (
+  <NavLink
+    to="/ai-review"
+    className={navLinkClass}
+  >
+    AI Review
+  </NavLink>
+)}
+
 
               {!token ? (
                 <NavLink
