@@ -33,13 +33,14 @@ async function request<T>(
 ): Promise<T> {
   const headers = new Headers(options.headers);
 
-  headers.set("Content-Type", "application/json");
+  if (options.body !== undefined && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
 
   if (token) {
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  // Normalize the path to prevent URLs containing "//api".
   const normalizedPath = `/${path.replace(/^\/+/, "")}`;
   const url = `${API_URL}${normalizedPath}`;
 
@@ -84,15 +85,24 @@ export function loginUser(data: {
   });
 }
 
-export function fetchItems(): Promise<ApiLostFoundItem[]> {
-  return request<ApiLostFoundItem[]>("/api/lost-found-items");
+export function fetchItems(
+  token: string
+): Promise<ApiLostFoundItem[]> {
+  return request<ApiLostFoundItem[]>(
+    "/api/lost-found-items",
+    {},
+    token
+  );
 }
 
 export function fetchItemById(
-  id: string
+  id: string,
+  token: string
 ): Promise<ApiLostFoundItem> {
   return request<ApiLostFoundItem>(
-    `/api/lost-found-items/${encodeURIComponent(id)}`
+    `/api/lost-found-items/${encodeURIComponent(id)}`,
+    {},
+    token
   );
 }
 
@@ -109,6 +119,38 @@ export function createItem(
     {
       method: "POST",
       body: JSON.stringify(data),
+    },
+    token
+  );
+}
+
+export function updateItem(
+  id: string,
+  data: {
+    title?: string;
+    description?: string;
+    type?: "lost" | "found";
+  },
+  token: string
+): Promise<ApiLostFoundItem> {
+  return request<ApiLostFoundItem>(
+    `/api/lost-found-items/${encodeURIComponent(id)}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    },
+    token
+  );
+}
+
+export function deleteItem(
+  id: string,
+  token: string
+): Promise<void> {
+  return request<void>(
+    `/api/lost-found-items/${encodeURIComponent(id)}`,
+    {
+      method: "DELETE",
     },
     token
   );

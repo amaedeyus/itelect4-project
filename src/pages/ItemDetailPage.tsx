@@ -1,24 +1,50 @@
+
 import { Link, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 
 import ItemCard from "../components/ItemCard";
-
 import { fetchItemById } from "../api/client";
+import { useAuthStore } from "../store/authStore";
 
 import type { ApiLostFoundItem, LostFoundItem } from "../types";
 
 function ItemDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const token = useAuthStore((state) => state.token);
 
   const {
     data: item,
     isPending,
     isError,
+    error,
   } = useQuery<ApiLostFoundItem>({
     queryKey: ["items", id],
-    queryFn: () => fetchItemById(id!),
-    enabled: id !== undefined,
+    queryFn: () => {
+      if (!id || !token) {
+        throw new Error("Missing item ID or authentication token.");
+      }
+
+      return fetchItemById(id, token);
+    },
+    enabled: Boolean(id && token),
   });
+
+  if (!token) {
+    return (
+      <div className="rounded-lg bg-yellow-50 p-6 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
+        <h1 className="text-2xl font-bold">Login Required</h1>
+        <p className="mt-2">
+          Please log in to view this item's details.
+        </p>
+        <Link
+          to="/login"
+          className="mt-4 inline-block rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+        >
+          Go to Login
+        </Link>
+      </div>
+    );
+  }
 
   if (isPending) {
     return <p>Loading item...</p>;
@@ -28,11 +54,13 @@ function ItemDetailPage() {
     return (
       <div className="rounded-lg bg-red-50 p-6 text-red-700 dark:bg-red-900/30 dark:text-red-300">
         <h1 className="text-2xl font-bold">
-          Item Not Found
+          Unable to Load Item
         </h1>
 
         <p className="mt-2">
-          No lost or found item exists with ID #{id}.
+          {error instanceof Error
+            ? error.message
+            : `No lost or found item exists with ID #${id}.`}
         </p>
 
         <Link
@@ -65,10 +93,7 @@ function ItemDetailPage() {
         Item Details
       </h1>
 
-      <ItemCard
-        item={itemForCard}
-        variant="default"
-      />
+      <ItemCard item={itemForCard} variant="default" />
 
       <div className="mt-6 rounded-lg bg-gray-100 p-5 dark:bg-gray-800">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
